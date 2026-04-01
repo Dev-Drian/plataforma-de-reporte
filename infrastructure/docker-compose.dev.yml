@@ -1,0 +1,148 @@
+services:
+  # PostgreSQL Database (igual que producción)
+  postgres:
+    image: postgres:15-alpine
+    container_name: marketing-seo-postgres-dev
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+      POSTGRES_DB: ${POSTGRES_DB:-marketing_seo}
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - marketing-seo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-marketing_seo}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (igual que producción)
+  redis:
+    image: redis:7-alpine
+    container_name: marketing-seo-redis-dev
+    ports:
+      - "16379:6379"
+    volumes:
+      - redis_data_dev:/data
+    networks:
+      - marketing-seo-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Gateway (Express) - MODO DESARROLLO con hot-reload
+  gateway:
+    build:
+      context: ../backend-gateway
+      dockerfile: Dockerfile.dev
+    container_name: marketing-seo-gateway-dev
+    environment:
+      PORT: 4000
+      NODE_ENV: development
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      FASTAPI_BASE_URL: http://backend-data:8000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@postgres:5432/${POSTGRES_DB:-marketing_seo}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "4000:4000"
+    volumes:
+      # Montar el código fuente para hot-reload (sin :ro para permitir escritura si es necesario)
+      - ../backend-gateway/src:/app/src
+      - ../backend-gateway/package.json:/app/package.json
+      - ../backend-gateway/tsconfig.json:/app/tsconfig.json
+      # node_modules se mantiene en el contenedor (no se monta)
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend-data:
+        condition: service_started
+    networks:
+      - marketing-seo-network
+
+  # Backend Datos (FastAPI) - MODO DESARROLLO con hot-reload
+  backend-data:
+    build:
+      context: ../backend-data
+      dockerfile: Dockerfile.dev
+    container_name: marketing-seo-backend-data-dev
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@postgres:5432/${POSTGRES_DB:-marketing_seo}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      # Coincidir con Google Cloud: http://localhost:PUERTO/oauth/callback (no mezclar con 127.0.0.1)
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
+      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID:-}
+      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET:-}
+      TIKTOK_CLIENT_ID: ${TIKTOK_CLIENT_ID:-}
+      TIKTOK_CLIENT_SECRET: ${TIKTOK_CLIENT_SECRET:-}
+    ports:
+      - "8003:8000"
+    volumes:
+      # Montar el código fuente para hot-reload (sin :ro para permitir escritura si es necesario)
+      - ../backend-data/app:/app/app
+      - ../backend-data/main.py:/app/main.py
+      - ../backend-data/alembic:/app/alembic
+      - ../backend-data/alembic.ini:/app/alembic.ini
+      - ../backend-data/requirements.txt:/app/requirements.txt
+      - ../backend-data/scripts:/app/scripts
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - marketing-seo-network
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Frontend (React) - MODO DESARROLLO con hot-reload
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.dev
+    container_name: marketing-seo-frontend-dev
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4000/api}
+    ports:
+      - "80:3000"
+    volumes:
+      # Montar el código fuente para hot-reload (sin :ro para permitir escritura de Vite)
+      - ../frontend/src:/app/src
+      - ../frontend/public:/app/public
+      - ../frontend/index.html:/app/index.html
+      - ../frontend/vite.config.ts:/app/vite.config.ts
+      - ../frontend/tsconfig.json:/app/tsconfig.json
+      - ../frontend/tsconfig.node.json:/app/tsconfig.node.json
+      - ../frontend/tailwind.config.js:/app/tailwind.config.js
+      - ../frontend/postcss.config.js:/app/postcss.config.js
+      - ../frontend/package.json:/app/package.json
+      # node_modules se mantiene en el contenedor (no se monta)
+      # dist se crea en el contenedor (Vite lo maneja)
+    depends_on:
+      - gateway
+    networks:
+      - marketing-seo-network
+
+volumes:
+  postgres_data_dev:
+  redis_data_dev:
+
+networks:
+  marketing-seo-network:
+    driver: bridge
+
