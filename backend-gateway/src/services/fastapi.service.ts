@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-const FASTAPI_BASE_URL = process.env.FASTAPI_BASE_URL || 'http://localhost:8000'
-
 export const callFastAPIService = async (
   endpoint: string,
   options: {
@@ -12,6 +10,7 @@ export const callFastAPIService = async (
   } = {}
 ) => {
   const { method = 'GET', params, data, headers = {} } = options
+  const FASTAPI_BASE_URL = process.env.FASTAPI_BASE_URL || 'http://localhost:8000'
 
   try {
     const response = await axios({
