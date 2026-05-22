@@ -1,0 +1,67 @@
+# ==============================
+# VARIABLES DE ENTORNO (SECRETOS)
+# ==============================
+.env
+.env.local
+.env.production
+.env.development
+# Permitir solo los de ejemplo
+!.env.example
+!.env.production.example
+
+# ==============================
+# DEPENDENCIAS
+# ==============================
+node_modules/
+**/node_modules/
+
+# ==============================
+# BUILDS / COMPILADOS
+# ==============================
+dist/
+**/dist/
+assets/
+build/
+
+# ==============================
+# PYTHON
+# ==============================
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+ENV/
+*.egg-info/
+
+# ==============================
+# LOGS
+# ==============================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+
+# ==============================
+# SISTEMA OPERATIVO
+# ==============================
+.DS_Store
+Thumbs.db
+
+# ==============================
+# BASE DE DATOS
+# ==============================
+*.db
+*.sqlite
+*.sqlite3
+
+# ==============================
+# EDITORES
+# ==============================
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
