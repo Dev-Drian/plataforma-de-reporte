@@ -105,6 +105,8 @@ async def google_ads_credentials_for_limopress_sync(
                 "account_name": a.account_name,
                 "refresh_token": a.refresh_token,
                 "is_mcc": bool(extra.get("is_mcc", False)),
+                "is_subaccount": bool(extra.get("is_subaccount", False)),
+                "parent_customer_id": extra.get("parent_customer_id"),
             }
         )
 

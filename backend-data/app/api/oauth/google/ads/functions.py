@@ -9,6 +9,19 @@ from app.models import OAuthConfig
 logger = logging.getLogger(__name__)
 
 
+def _dedupe_ads_accounts(accounts: List[dict]) -> List[dict]:
+    """Elimina duplicados por customer_id (p. ej. MCC listado como accesible y como padre)."""
+    seen: set[str] = set()
+    out: List[dict] = []
+    for acc in accounts:
+        cid = (acc.get("customer_id") or "").replace("-", "")
+        if not cid or cid in seen:
+            continue
+        seen.add(cid)
+        out.append(acc)
+    return out
+
+
 async def get_google_ads_accessible_customers(
     access_token: str, 
     config: OAuthConfig, 
@@ -202,7 +215,7 @@ async def get_google_ads_accessible_customers(
                     })
             
             logger.info(f"✅ Total de cuentas procesadas: {len(accounts_list)}")
-            return accounts_list
+            return _dedupe_ads_accounts(accounts_list)
             
         except Exception as e:
             logger.error(f"❌ Error al procesar cuentas: {str(e)}")

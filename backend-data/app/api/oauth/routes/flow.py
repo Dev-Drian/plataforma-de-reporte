@@ -21,6 +21,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 from app.api.oauth.utils.auth_url import build_auth_url
+from app.api.oauth.utils.oauth_config_resolver import resolve_oauth_config
 from app.api.oauth.utils.token_exchange import exchange_code_for_tokens
 from app.api.oauth.google.ads.functions import get_google_ads_accessible_customers
 from app.api.oauth.google.analytics.functions import get_first_analytics_property, get_all_analytics_properties
@@ -276,12 +277,13 @@ async def init_oauth_flow(
     try:
         logger.info(f"🔐 Iniciando OAuth - Platform: {oauth_data.platform}, Type: {oauth_data.account_type}")
         
-        # Obtener configuración OAuth
-        config = db.query(OAuthConfig).filter(
-            OAuthConfig.organization_id == current_user.organization_id,
-            OAuthConfig.platform == oauth_data.platform.lower(),
-            OAuthConfig.is_active == True
-        ).first()
+        # Obtener configuración OAuth (fallback al tenant si el cliente no tiene fila propia)
+        config = resolve_oauth_config(
+            db,
+            current_user,
+            oauth_data.platform,
+            request,
+        )
         
         if not config:
             logger.warning(f"⚠️ No se encontró configuración OAuth para {oauth_data.platform}")
@@ -346,12 +348,13 @@ async def oauth_callback(
     # Validar state token (en producción, validar contra Redis/sesión)
     # Por ahora solo verificamos que existe
     
-    # Obtener configuración OAuth
-    config = db.query(OAuthConfig).filter(
-        OAuthConfig.organization_id == current_user.organization_id,
-        OAuthConfig.platform == callback_data.platform.lower(),
-        OAuthConfig.is_active == True
-    ).first()
+    # Obtener configuración OAuth (fallback al tenant si el cliente no tiene fila propia)
+    config = resolve_oauth_config(
+        db,
+        current_user,
+        callback_data.platform,
+        request,
+    )
     
     if not config:
         return error_response(
