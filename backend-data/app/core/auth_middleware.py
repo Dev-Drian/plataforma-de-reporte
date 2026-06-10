@@ -23,6 +23,13 @@ async def get_current_user(
     proxy_key = request.headers.get("X-Limopress-Proxy-Key") or ""
 
     if proxy_key:
+        secret = (settings.LIMOPRESS_PROXY_SECRET or "").strip()
+        if secret and proxy_key != secret:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid Limopress proxy credentials",
+            )
+
         user_id_str = request.headers.get("X-Limopress-User-ID")
         tenant_id_str = request.headers.get("X-Limopress-Tenant-ID")
         client_id_str = request.headers.get("X-Limopress-Client-ID")
