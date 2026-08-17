@@ -18,7 +18,7 @@ class SyncJob(Base):
     __tablename__ = "sync_jobs"
 
     id = Column(Integer, primary_key=True, index=True)
-    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    organization_id = Column(Integer, ForeignKey("monitor_organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     account_id = Column(Integer, ForeignKey("accounts.id", ondelete="SET NULL"), nullable=True, index=True)
     job_type = Column(String(50), nullable=False, index=True)  # seo, ads, analytics, gbp
     platform = Column(String(50), nullable=False)  # google, meta, linkedin, tiktok

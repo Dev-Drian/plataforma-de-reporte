@@ -12,7 +12,7 @@ class OAuthConfig(Base):
     __tablename__ = "oauth_configs"
 
     id = Column(Integer, primary_key=True, index=True)
-    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    organization_id = Column(Integer, ForeignKey("monitor_organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     provider_id = Column(Integer, ForeignKey("oauth_providers.id", ondelete="SET NULL"), nullable=True, index=True)
     platform = Column(String(50), nullable=False, index=True)  # google, meta, linkedin, tiktok
     client_id = Column(String(500), nullable=False)  # OAuth Client ID

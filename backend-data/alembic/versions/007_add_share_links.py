@@ -37,8 +37,8 @@ def upgrade() -> None:
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
-        sa.ForeignKeyConstraint(['created_by'], ['users.id'], ondelete='SET NULL'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['created_by'], ['monitor_users.id'], ondelete='SET NULL'),
     )
     
     # Crear índices

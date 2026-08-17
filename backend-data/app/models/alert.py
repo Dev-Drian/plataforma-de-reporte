@@ -9,7 +9,7 @@ class Alert(Base):
     __tablename__ = "alerts"
 
     id = Column(Integer, primary_key=True, index=True)
-    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    organization_id = Column(Integer, ForeignKey("monitor_organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     alert_type = Column(String(50), nullable=False, index=True)  # metric_drop, threshold, error, etc.
     severity = Column(String(20), nullable=False, default="info")  # info, warning, error, critical
     title = Column(String(255), nullable=False)

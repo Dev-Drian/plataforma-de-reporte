@@ -6,7 +6,7 @@ from app.core.database import Base
 
 class Role(Base):
     """Roles del sistema (admin, user, viewer, etc.)"""
-    __tablename__ = "roles"
+    __tablename__ = "monitor_roles"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(50), unique=True, nullable=False, index=True)

@@ -12,7 +12,7 @@ class Account(Base):
     __tablename__ = "accounts"
 
     id = Column(Integer, primary_key=True, index=True)
-    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    organization_id = Column(Integer, ForeignKey("monitor_organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     platform = Column(String(50), nullable=False, index=True)  # google, meta, linkedin, tiktok
     account_type = Column(String(50), nullable=False)  # search_console, analytics, ads, gbp, etc.
     account_id = Column(String(255), nullable=False)  # ID de la cuenta en la plataforma externa (obtenido después de OAuth)

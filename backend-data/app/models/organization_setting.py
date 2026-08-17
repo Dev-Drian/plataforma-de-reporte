@@ -9,7 +9,7 @@ class OrganizationSetting(Base):
     __tablename__ = "organization_settings"
 
     id = Column(Integer, primary_key=True, index=True)
-    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    organization_id = Column(Integer, ForeignKey("monitor_organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     key = Column(String(100), nullable=False, index=True)
     value = Column(Text, nullable=True)
     description = Column(Text, nullable=True)

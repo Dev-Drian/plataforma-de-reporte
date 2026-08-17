@@ -22,7 +22,7 @@ class ShareLink(Base):
     __tablename__ = "share_links"
 
     id = Column(Integer, primary_key=True, index=True)
-    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    organization_id = Column(Integer, ForeignKey("monitor_organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     
     # Token único para acceso público (va en la URL)
     token = Column(String(64), unique=True, nullable=False, index=True, default=generate_share_token)
@@ -61,7 +61,7 @@ class ShareLink(Base):
     expires_at = Column(DateTime(timezone=True), nullable=True)  # null = sin expiración
     
     # Auditoría
-    created_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    created_by = Column(Integer, ForeignKey("monitor_users.id", ondelete="SET NULL"), nullable=True)
     last_accessed = Column(DateTime(timezone=True), nullable=True)
     access_count = Column(Integer, default=0, nullable=False)
     

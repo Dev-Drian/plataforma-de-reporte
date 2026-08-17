@@ -9,7 +9,7 @@ class Keyword(Base):
     __tablename__ = "keywords"
 
     id = Column(Integer, primary_key=True, index=True)
-    organization_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
+    organization_id = Column(Integer, ForeignKey("monitor_organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     keyword = Column(String(255), nullable=False, index=True)
     category = Column(String(100), nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)

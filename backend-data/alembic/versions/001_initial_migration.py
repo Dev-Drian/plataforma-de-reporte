@@ -22,7 +22,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     # Organizations table
     op.create_table(
-        'organizations',
+        'monitor_organizations',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(length=255), nullable=False),
         sa.Column('slug', sa.String(length=255), nullable=False),
@@ -33,13 +33,13 @@ def upgrade() -> None:
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_organizations_id'), 'organizations', ['id'], unique=False)
-    op.create_index(op.f('ix_organizations_name'), 'organizations', ['name'], unique=False)
-    op.create_index(op.f('ix_organizations_slug'), 'organizations', ['slug'], unique=True)
+    op.create_index(op.f('ix_monitor_organizations_id'), 'monitor_organizations', ['id'], unique=False)
+    op.create_index(op.f('ix_monitor_organizations_name'), 'monitor_organizations', ['name'], unique=False)
+    op.create_index(op.f('ix_monitor_organizations_slug'), 'monitor_organizations', ['slug'], unique=True)
 
     # Roles table
     op.create_table(
-        'roles',
+        'monitor_roles',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(length=50), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
@@ -49,12 +49,12 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('name')
     )
-    op.create_index(op.f('ix_roles_id'), 'roles', ['id'], unique=False)
-    op.create_index(op.f('ix_roles_name'), 'roles', ['name'], unique=True)
+    op.create_index(op.f('ix_monitor_roles_id'), 'monitor_roles', ['id'], unique=False)
+    op.create_index(op.f('ix_monitor_roles_name'), 'monitor_roles', ['name'], unique=True)
 
     # Users table
     op.create_table(
-        'users',
+        'monitor_users',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('organization_id', sa.Integer(), nullable=False),
         sa.Column('email', sa.String(length=255), nullable=False),
@@ -67,13 +67,13 @@ def upgrade() -> None:
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('extra_data', sa.Text(), nullable=True),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('email')
     )
-    op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
-    op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
-    op.create_index(op.f('ix_users_organization_id'), 'users', ['organization_id'], unique=False)
+    op.create_index(op.f('ix_monitor_users_id'), 'monitor_users', ['id'], unique=False)
+    op.create_index(op.f('ix_monitor_users_email'), 'monitor_users', ['email'], unique=True)
+    op.create_index(op.f('ix_monitor_users_organization_id'), 'monitor_users', ['organization_id'], unique=False)
 
     # User roles table
     op.create_table(
@@ -82,8 +82,8 @@ def upgrade() -> None:
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('role_id', sa.Integer(), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ondelete='CASCADE'),
-        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['role_id'], ['monitor_roles.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['user_id'], ['monitor_users.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('user_id', 'role_id', name='uq_user_role')
     )
@@ -101,7 +101,7 @@ def upgrade() -> None:
         sa.Column('description', sa.Text(), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_organization_settings_id'), 'organization_settings', ['id'], unique=False)
@@ -119,7 +119,7 @@ def upgrade() -> None:
         sa.Column('notes', sa.Text(), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_keywords_id'), 'keywords', ['id'], unique=False)
@@ -141,7 +141,7 @@ def upgrade() -> None:
         sa.Column('last_sync', sa.DateTime(timezone=True), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_accounts_id'), 'accounts', ['id'], unique=False)
@@ -161,7 +161,7 @@ def upgrade() -> None:
         sa.Column('is_active', sa.Boolean(), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_cities_id'), 'cities', ['id'], unique=False)
@@ -188,7 +188,7 @@ def upgrade() -> None:
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.ForeignKeyConstraint(['keyword_id'], ['keywords.id'], ondelete='SET NULL'),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_seo_metrics_id'), 'seo_metrics', ['id'], unique=False)
@@ -223,7 +223,7 @@ def upgrade() -> None:
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ondelete='SET NULL'),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_ads_metrics_id'), 'ads_metrics', ['id'], unique=False)
@@ -256,7 +256,7 @@ def upgrade() -> None:
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ondelete='SET NULL'),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_analytics_metrics_id'), 'analytics_metrics', ['id'], unique=False)
@@ -289,7 +289,7 @@ def upgrade() -> None:
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ondelete='SET NULL'),
         sa.ForeignKeyConstraint(['city_id'], ['cities.id'], ondelete='SET NULL'),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_gbp_metrics_id'), 'gbp_metrics', ['id'], unique=False)
@@ -317,7 +317,7 @@ def upgrade() -> None:
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ondelete='SET NULL'),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_sync_jobs_id'), 'sync_jobs', ['id'], unique=False)
@@ -336,7 +336,7 @@ def upgrade() -> None:
         sa.Column('message', sa.Text(), nullable=False),
         sa.Column('details', sa.Text(), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['sync_job_id'], ['sync_jobs.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
@@ -361,7 +361,7 @@ def upgrade() -> None:
         sa.Column('resolved_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-        sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['organization_id'], ['monitor_organizations.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_alerts_id'), 'alerts', ['id'], unique=False)
@@ -447,17 +447,17 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_user_roles_id'), table_name='user_roles')
     op.drop_table('user_roles')
     
-    op.drop_index(op.f('ix_users_organization_id'), table_name='users')
-    op.drop_index(op.f('ix_users_email'), table_name='users')
-    op.drop_index(op.f('ix_users_id'), table_name='users')
-    op.drop_table('users')
+    op.drop_index(op.f('ix_monitor_users_organization_id'), table_name='monitor_users')
+    op.drop_index(op.f('ix_monitor_users_email'), table_name='monitor_users')
+    op.drop_index(op.f('ix_monitor_users_id'), table_name='monitor_users')
+    op.drop_table('monitor_users')
     
-    op.drop_index(op.f('ix_roles_name'), table_name='roles')
-    op.drop_index(op.f('ix_roles_id'), table_name='roles')
-    op.drop_table('roles')
+    op.drop_index(op.f('ix_monitor_roles_name'), table_name='monitor_roles')
+    op.drop_index(op.f('ix_monitor_roles_id'), table_name='monitor_roles')
+    op.drop_table('monitor_roles')
     
-    op.drop_index(op.f('ix_organizations_slug'), table_name='organizations')
-    op.drop_index(op.f('ix_organizations_name'), table_name='organizations')
-    op.drop_index(op.f('ix_organizations_id'), table_name='organizations')
-    op.drop_table('organizations')
+    op.drop_index(op.f('ix_monitor_organizations_slug'), table_name='monitor_organizations')
+    op.drop_index(op.f('ix_monitor_organizations_name'), table_name='monitor_organizations')
+    op.drop_index(op.f('ix_monitor_organizations_id'), table_name='monitor_organizations')
+    op.drop_table('monitor_organizations')
 

@@ -6,7 +6,7 @@ from app.core.database import Base
 
 class Organization(Base):
     """Organización/Tenant para SaaS multi-tenant"""
-    __tablename__ = "organizations"
+    __tablename__ = "monitor_organizations"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False, index=True)
