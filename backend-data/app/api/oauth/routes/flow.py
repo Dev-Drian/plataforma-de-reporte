@@ -345,8 +345,25 @@ async def oauth_callback(
     Callback del flujo OAuth
     Intercambia el authorization code por tokens y crea/actualiza la cuenta
     """
-    # Validar state token (en producción, validar contra Redis/sesión)
-    # Por ahora solo verificamos que existe
+    # Validar el state contra el guardado en /oauth/init: sin esto, un code ajeno
+    # (CSRF / login forzado) acabaría conectado a la organización de quien llama.
+    # La segunda llamada (selección, sin code) usa los tokens cacheados con ese mismo
+    # state, que solo existen si la primera pasó esta validación.
+    if callback_data.code:
+        state_data = get_from_cache(f"oauth:state:{callback_data.state}") if callback_data.state else None
+        if (
+            not state_data
+            or str(state_data.get("organization_id")) != str(current_user.organization_id)
+            or str(state_data.get("user_id")) != str(current_user.id)
+            or (state_data.get("platform") or "").lower() != (callback_data.platform or "").lower()
+        ):
+            logger.warning("OAuth callback con state inválido o caducado")
+            return error_response(
+                "La conexión caducó o no es válida. Vuelve a intentarlo desde el botón Conectar.",
+                400,
+                "invalid_state",
+                str(request.url.path)
+            )
     
     # Obtener configuración OAuth (fallback al tenant si el cliente no tiene fila propia)
     config = resolve_oauth_config(
