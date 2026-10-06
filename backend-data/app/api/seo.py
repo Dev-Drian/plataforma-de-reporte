@@ -142,10 +142,16 @@ async def get_seo_metrics(
             "meta": "Meta (Facebook/Instagram)",
             "linkedin": "LinkedIn"
         }
-        return error_response(
-            message=f"No hay cuenta de {platform_names.get(platform_name, 'SEO')} configurada. Configúrala en Settings > Cuentas.",
-            status_code=400,
-            error=f"No {platform_name} SEO account configured",
+        return success_response(
+            data={
+                "clicks": 0,
+                "impressions": 0,
+                "ctr": 0,
+                "position": 0,
+                "connected": False
+            },
+            message=f"No hay cuenta de {platform_names.get(platform_name, 'SEO')} configurada",
+            status_code=200,
             path=str(request.url.path)
         )
     
