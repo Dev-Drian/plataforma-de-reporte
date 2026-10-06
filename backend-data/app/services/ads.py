@@ -82,7 +82,7 @@ class AdsService:
                 "client_secret": credentials_dict.get('client_secret'),
                 "refresh_token": credentials_dict.get('refresh_token'),
                 "use_proto_plus": True,
-                "version": "v21"  # Especificar versión de API explícitamente (v17 fue descontinuada)
+                "version": "v25"  # Especificar versión de API explícitamente (v17 fue descontinuada)
             }
             
             # Si se proporciona login_customer_id, agregarlo a la configuración
@@ -118,7 +118,7 @@ class AdsService:
         try:
             # FIX: Usar CustomerServiceClient correctamente
             # Especificar versión explícitamente (v17 fue descontinuada, usar v21+)
-            customer_service = self.client.get_service("CustomerService", version="v21")
+            customer_service = self.client.get_service("CustomerService", version="v25")
             
             # FIX: Llamar al método correcto sin parámetros
             # Este endpoint no requiere customer_id
@@ -206,7 +206,7 @@ class AdsService:
         
         try:
             # Especificar versión explícitamente (v17 fue descontinuada, usar v21+)
-            ga_service = self.client.get_service("GoogleAdsService", version="v21")
+            ga_service = self.client.get_service("GoogleAdsService", version="v25")
             
             # Query simple y directo para verificar si es manager account
             query = """
@@ -261,7 +261,7 @@ class AdsService:
         
         try:
             # Especificar versión explícitamente (v17 fue descontinuada, usar v21+)
-            ga_service = self.client.get_service("GoogleAdsService", version="v21")
+            ga_service = self.client.get_service("GoogleAdsService", version="v25")
             
             query = """
                 SELECT
@@ -327,7 +327,7 @@ class AdsService:
         
         try:
             # Especificar versión explícitamente (v17 fue descontinuada, usar v21+)
-            ga_service = self.client.get_service("GoogleAdsService", version="v21")
+            ga_service = self.client.get_service("GoogleAdsService", version="v25")
             
             query = """
                 SELECT
@@ -394,7 +394,7 @@ class AdsService:
         
         try:
             # Especificar versión explícitamente (v17 fue descontinuada, usar v21+)
-            ga_service = self.client.get_service("GoogleAdsService", version="v21")
+            ga_service = self.client.get_service("GoogleAdsService", version="v25")
             
             # Query para obtener métricas agregadas por día y luego sumarlas
             query = f"""
@@ -568,7 +568,7 @@ class AdsService:
         
         try:
             # Especificar versión explícitamente (v17 fue descontinuada, usar v21+)
-            ga_service = self.client.get_service("GoogleAdsService", version="v21")
+            ga_service = self.client.get_service("GoogleAdsService", version="v25")
             
             query = """
                 SELECT
@@ -714,7 +714,7 @@ class AdsService:
         
         try:
             # Especificar versión explícitamente (v17 fue descontinuada, usar v21+)
-            ga_service = self.client.get_service("GoogleAdsService", version="v21")
+            ga_service = self.client.get_service("GoogleAdsService", version="v25")
             
             query = f"""
                 SELECT

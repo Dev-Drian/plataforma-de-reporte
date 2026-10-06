@@ -314,9 +314,13 @@ async def delete_account(
         db.commit()
         return no_content_response()
     else:
-        # Soft delete
+        # Soft delete. The access stops here: stored tokens are wiped (the
+        # privacy policy promises it); connecting again issues new ones.
         account.deleted_at = datetime.utcnow()
         account.is_active = False
+        account.access_token = None
+        account.refresh_token = None
+        account.credentials = None
         db.commit()
         db.refresh(account)
         

@@ -87,7 +87,7 @@ async def get_google_ads_accessible_customers(
             # Usar el patrón oficial de google-ads library
             # ESPECIFICAR VERSIÓN EXPLÍCITAMENTE: v17 fue descontinuada, usar v21 o superior
             # El método get_service acepta el parámetro version (por defecto es 'v22')
-            customer_service = client.get_service("CustomerService", version="v21")
+            customer_service = client.get_service("CustomerService", version="v25")
             
             logger.info(f"🔍 Llamando a list_accessible_customers()...")
             
@@ -126,7 +126,7 @@ async def get_google_ads_accessible_customers(
                 
                 # Obtener información de cada cuenta usando GoogleAdsService
                 # Especificar versión explícitamente (v17 fue descontinuada, usar v21+)
-                ga_service = client.get_service("GoogleAdsService", version="v21")
+                ga_service = client.get_service("GoogleAdsService", version="v25")
                 query = """
                     SELECT
                         customer.id,
@@ -297,7 +297,7 @@ async def get_google_ads_customer_id(
             # Usar el patrón oficial de google-ads library
             # ESPECIFICAR VERSIÓN EXPLÍCITAMENTE: v17 fue descontinuada, usar v21 o superior
             # El método get_service acepta el parámetro version (por defecto es 'v22')
-            customer_service = client.get_service("CustomerService", version="v21")
+            customer_service = client.get_service("CustomerService", version="v25")
             
             logger.info(f"🔍 Llamando a list_accessible_customers()...")
             
@@ -357,7 +357,7 @@ async def get_google_ads_customer_id(
             
             # Obtener información detallada
             # Especificar versión explícitamente (v17 fue descontinuada, usar v21+)
-            ga_service = client.get_service("GoogleAdsService", version="v21")
+            ga_service = client.get_service("GoogleAdsService", version="v25")
             
             query = """
                 SELECT
